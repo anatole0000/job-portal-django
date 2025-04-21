@@ -1,0 +1,104 @@
+<!-- templates/jobs/create_job.html -->
+{% extends 'jobs/base.html' %}
+
+{% block content %}
+    <div class="job-form-container">
+        <h2>Create a New Job</h2>
+        <form method="post" class="job-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.title.id_for_label }}">Job Title</label>
+                {{ form.title }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}">Description</label>
+                {{ form.description }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.location.id_for_label }}">Location</label>
+                {{ form.location }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.company_name.id_for_label }}">Company Name</label>
+                {{ form.company_name }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.salary.id_for_label }}">Salary</label>
+                {{ form.salary }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.is_active.id_for_label }}">Active</label>
+                {{ form.is_active }}
+            </div>
+            <button type="submit" class="submit-btn">Create Job</button>
+        </form>
+    </div>
+
+    <style>
+        .job-form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .job-form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .job-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .job-form-container .form-group input:focus,
+        .job-form-container .form-group textarea:focus,
+        .job-form-container .form-group select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+    </style>
+{% endblock %}

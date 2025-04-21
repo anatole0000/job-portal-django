@@ -1,0 +1,19 @@
+<!-- templates/jobs/job_detail.html -->
+{% extends 'jobs/base.html' %}
+{% block content %}
+<h2>{{ job.title }}</h2>
+<p><strong>Company:</strong> {{ job.company_name }}</p>
+<p><strong>Location:</strong> {{ job.location }}</p>
+<p><strong>Salary:</strong> {{ job.salary }}</p>
+<p><strong>Description:</strong> {{ job.description }}</p>
+<p><strong>Posted:</strong> {{ job.posted_date }}</p>
+
+{% if user.is_authenticated %}
+    <form action="{% url 'apply_to_job' job.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Apply for this job</button>
+    </form>
+{% else %}
+    <p><a href="{% url 'user_login' %}">Login</a> to apply for this job.</p>
+{% endif %}
+{% endblock %}

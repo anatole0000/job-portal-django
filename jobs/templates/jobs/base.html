@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .navbar {
+            background-color: #007BFF;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        .dark-mode .navbar {
+            background-color: #333;
+        }
+
+        .dark-mode {
+            background-color: #181818;
+            color: white;
+        }
+
+        .dark-mode hr {
+            background-color: #444;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .dark-mode a {
+            color: #bbb;
+        }
+
+        .dark-mode a:hover {
+            color: white;
+        }
+
+        #darkModeToggle {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        #darkModeToggle:hover {
+            background-color: #666;
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background-color: #eee;
+            margin: 0;
+        }
+
+        .nav-left {
+            font-weight: bold;
+        }
+
+        .nav-right a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        .nav-right a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="nav-left">
+            {% if user.is_authenticated %}
+                Welcome, {{ user.username }}
+            {% else %}
+                Job Portal
+            {% endif %}
+        </div>
+        <div class="nav-right">
+            {% if user.is_authenticated %}
+                <a href="{% url 'job_list' %}">Jobs</a>
+                <a href="{% url 'create_job' %}">Create Job</a>
+                <a href="{% url 'user_applications' %}">My Applications</a>
+                <a href="{% url 'user_profile' %}">Profile</a>
+                <a href="{% url 'user_logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'user_login' %}">Login</a>
+                <a href="{% url 'register' %}">Register</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <button id="darkModeToggle" title="Toggle Dark Mode" style="font-size: 20px; background: none; border: none; cursor: pointer;">
+        🌙
+    </button>
+    
+    
+
+    <hr>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        const toggleButton = document.getElementById('darkModeToggle');
+        const body = document.body;
+    
+        function updateIcon() {
+            toggleButton.textContent = body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
+    
+        // Check if dark mode was previously selected
+        if (localStorage.getItem('darkMode') === 'true') {
+            body.classList.add('dark-mode');
+            updateIcon();
+        }
+    
+        toggleButton.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDarkMode = body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            updateIcon();
+        });
+    </script>
+    
+</body>
+</html>

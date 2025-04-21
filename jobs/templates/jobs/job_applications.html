@@ -1,0 +1,33 @@
+{% extends 'jobs/base.html' %}
+{% block content %}
+<h2>Applications for {{ job.title }}</h2>
+
+<table>
+    <tr>
+        <th>Applicant</th>
+        <th>Cover Letter</th>
+        <th>Status</th>
+        <th>Update</th>
+    </tr>
+    {% for app in applications %}
+    <tr>
+        <td>{{ app.user.username }}</td>
+        <td>{{ app.cover_letter }}</td>
+        <td>{{ app.status }}</td>
+        <td>
+            <form method="post" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="app_id" value="{{ app.id }}">
+                <select name="status">
+                    <option value="pending" {% if app.status == "pending" %}selected{% endif %}>Pending</option>
+                    <option value="interview" {% if app.status == "interview" %}selected{% endif %}>Interview</option>
+                    <option value="accepted" {% if app.status == "accepted" %}selected{% endif %}>Accepted</option>
+                    <option value="rejected" {% if app.status == "rejected" %}selected{% endif %}>Rejected</option>
+                </select>
+                <button type="submit">Update</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

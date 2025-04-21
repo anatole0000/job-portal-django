@@ -1,0 +1,124 @@
+{% extends 'jobs/base.html' %}
+
+{% block content %}
+<style>
+    .job-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .search-form {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+    }
+
+    .search-form input[type="text"] {
+        padding: 8px;
+        width: 300px;
+        border: 1px solid #ccc;
+        border-radius: 4px 0 0 4px;
+    }
+
+    .search-form button {
+        padding: 8px 16px;
+        border: 1px solid #007BFF;
+        background-color: #007BFF;
+        color: white;
+        border-radius: 0 4px 4px 0;
+        cursor: pointer;
+    }
+
+    .job-card {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: box-shadow 0.2s;
+    }
+
+    .job-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .job-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .job-company {
+        color: #555;
+    }
+
+    .no-jobs {
+        text-align: center;
+        color: #999;
+    }
+
+    .pagination {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .pagination a {
+        padding: 8px 16px;
+        margin: 0 4px;
+        text-decoration: none;
+        color: #007BFF;
+        border: 1px solid #007BFF;
+        border-radius: 4px;
+    }
+
+    .pagination a:hover {
+        background-color: #007BFF;
+        color: white;
+    }
+
+    .pagination .current {
+        background-color: #007BFF;
+        color: white;
+    }
+</style>
+
+<div class="job-container">
+    <h2>Job Listings</h2>
+
+    <form method="get" class="search-form">
+        <input type="text" name="q" placeholder="Search jobs..." value="{{ request.GET.q }}">
+        <button type="submit">Search</button>
+    </form>
+
+    {% for job in page_obj %}
+        <div class="job-card">
+            <p class="job-title">
+                <a href="{% url 'job_detail' job.id %}">{{ job.title }}</a>
+            </p>
+            <p class="job-company">{{ job.company_name }} – {{ job.location }}</p>
+        </div>
+    {% empty %}
+        <p class="no-jobs">No jobs found.</p>
+    {% endfor %}
+
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1&q={{ search_query }}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}&q={{ search_query }}">Previous</a>
+        {% endif %}
+        
+        <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&q={{ search_query }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}&q={{ search_query }}">Last</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
