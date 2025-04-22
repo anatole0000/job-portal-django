@@ -4,9 +4,12 @@ A web application for job seekers and employers. The platform allows users to cr
 
 ## Features
 
-- Job listings with search functionality.
-- Apply for jobs and track application statuses.
-- User profile management with the ability to update information and upload a profile picture.
+- 🔍 Job listing and filtering
+- 👤 User authentication (login/register)
+- 📄 Apply for jobs
+- 💾 Save jobs
+- 🎯 **Job Matching** - users get matched with relevant jobs based on profile
+- 🤖 **Job Recommendations** - AI-based or logic-based recommendations for jobs
 
 ## Technologies Used
 
