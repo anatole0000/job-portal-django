@@ -39,6 +39,7 @@ To populate the database with sample job postings, run the `popular_fake_jobs.py
 ```bash
 python popular_fake_jobs.py
 
+
 ## Screenshot
 
-![Project Screenshot](assets/image.pnggit add assets/)
+![Project Screenshot](assets/image.png)
