@@ -18,8 +18,18 @@ from .forms import JobForm
 from django.core.paginator import Paginator
 from .models import UserProfile
 from .forms import UserProfileForm
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from .forms import JobSearchForm
+from .models import Job, SavedJob
 
 # Job Listing View
+# views.py
+from django.shortcuts import render
+from django.core.paginator import Paginator
+from .models import Job
+from .forms import JobSearchForm
+
 def job_list(request):
     jobs = Job.objects.all()
 
@@ -28,12 +38,44 @@ def job_list(request):
     if search_query:
         jobs = jobs.filter(title__icontains=search_query)
 
+    # Filter by location
+    location_filter = request.GET.get('location', '')
+    if location_filter:
+        jobs = jobs.filter(location__icontains=location_filter)
+
+    # Filter by salary range
+    salary_min = request.GET.get('salary_min', None)
+    salary_max = request.GET.get('salary_max', None)
+    if salary_min:
+        jobs = jobs.filter(salary_min__gte=salary_min)
+    if salary_max:
+        jobs = jobs.filter(salary_max__lte=salary_max)
+
+    # Filter by experience level
+    experience_level = request.GET.get('experience_level', '')
+    if experience_level:
+        jobs = jobs.filter(experience_level=experience_level)
+
+    # Filter by job type
+    job_type = request.GET.get('job_type', '')
+    if job_type:
+        jobs = jobs.filter(job_type=job_type)
+
     # Pagination
     paginator = Paginator(jobs, 5)  # Show 5 jobs per page
     page_number = request.GET.get('page')  # Get the current page number from the URL
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'jobs/job_list.html', {'page_obj': page_obj, 'search_query': search_query})
+    return render(request, 'jobs/job_list.html', {
+        'page_obj': page_obj, 
+        'search_query': search_query,
+        'location_filter': location_filter,
+        'salary_min': salary_min,
+        'salary_max': salary_max,
+        'experience_level': experience_level,
+        'job_type': job_type
+    })
+
 
 # Job Detail and Application View
 def job_detail(request, job_id):
@@ -200,3 +242,69 @@ def create_job(request):
         form = JobForm()
 
     return render(request, 'jobs/create_job.html', {'form': form})
+
+@login_required
+def job_matching(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+    user_skills = user_profile.skills.split(',')  # assuming skills are stored as comma-separated values
+    
+    # Get all jobs and filter by keyword match
+    jobs = Job.objects.all()
+    matched_jobs = []
+
+    for job in jobs:
+        job_skills = job.skills_required.split(',')  # assuming job skills are stored as comma-separated values
+        match_count = sum(1 for skill in user_skills if skill.strip().lower() in [s.lower() for s in job_skills])
+        
+        # If there is at least one match, add to matched_jobs
+        if match_count > 0:
+            matched_jobs.append((job, match_count))
+    
+    # Sort jobs by the number of matches (highest match first)
+    matched_jobs.sort(key=lambda x: x[1], reverse=True)
+
+    return render(request, 'jobs/job_matching.html', {'matched_jobs': matched_jobs})
+
+@login_required
+def recommend_jobs(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+    user_skills = user_profile.skills  # Assuming skills are stored as a string of keywords
+
+    # Get all jobs and their descriptions
+    jobs = Job.objects.all()
+    job_descriptions = [job.description for job in jobs]
+
+    # Combine user skills into a document for comparison
+    documents = job_descriptions + [user_skills]  # Add user skills as the last document
+
+    # Use TF-IDF to vectorize the job descriptions and user skills
+    vectorizer = TfidfVectorizer(stop_words='english')
+    tfidf_matrix = vectorizer.fit_transform(documents)
+
+    # Compute cosine similarity between the user profile and each job
+    cosine_similarities = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1])
+
+    # Sort the jobs by similarity score
+    similar_jobs = [(jobs[i], cosine_similarities[0][i]) for i in range(len(jobs))]
+    similar_jobs.sort(key=lambda x: x[1], reverse=True)
+
+    return render(request, 'jobs/job_recommendations.html', {'similar_jobs': similar_jobs})
+
+def save_application(request, job_id):
+    job = Job.objects.get(id=job_id)
+    if request.method == 'POST':
+        # Save the application with 'pending' status
+        application, created = Application.objects.get_or_create(user=request.user, job=job, status='pending')
+        return redirect('job_list')  # Redirect to job list after saving
+    return render(request, 'jobs/save_application.html', {'job': job})
+
+
+@login_required
+def save_job(request, job_id):
+    job = get_object_or_404(Job, id=job_id)
+
+    # Check if the job is already saved by the user
+    if not SavedJob.objects.filter(user=request.user, job=job).exists():
+        SavedJob.objects.create(user=request.user, job=job)
+
+    return redirect('job_list')  # Redirect back to the job list page

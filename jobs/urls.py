@@ -12,7 +12,7 @@ urlpatterns = [
     path('logout/', views.user_logout, name='user_logout'),
     path('create/', views.create_job, name='create_job'),
     path('job/<int:job_id>/apply/', views.apply_to_job, name='apply_to_job'),
-    
+    path('save_job/<int:job_id>/', views.save_job, name='save_job'),
     path('profile/', views.user_profile, name='user_profile'),
     path('job/<int:job_id>/applications/', views.job_applications, name='job_applications'),
     path('application/<int:application_id>/update_status/', views.update_application_status, name='update_application_status'),

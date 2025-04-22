@@ -1,0 +1,13 @@
+{% extends 'jobs/base.html' %}
+
+{% block content %}
+<h2>Recommended Jobs</h2>
+<ul>
+    {% for job, similarity in similar_jobs %}
+        <li>
+            <a href="{% url 'job_detail' job.id %}">{{ job.title }}</a> - 
+            Similarity Score: {{ similarity|floatformat:2 }}
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

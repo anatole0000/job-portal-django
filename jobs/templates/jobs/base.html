@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Portal</title>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,7 +22,6 @@
             justify-content: space-between;
             align-items: center;
             color: white;
-            transition: background-color 0.3s;
         }
 
         .dark-mode .navbar {
@@ -47,15 +50,16 @@
         }
 
         #darkModeToggle {
-            background-color: #444;
+            background-color: transparent;
             color: white;
             border: none;
             padding: 10px;
             cursor: pointer;
+            font-size: 20px;
         }
 
         #darkModeToggle:hover {
-            background-color: #666;
+            color: #ccc;
         }
 
         hr {
@@ -73,10 +77,25 @@
             color: white;
             text-decoration: none;
             margin-left: 15px;
+            font-size: 18px;
         }
 
         .nav-right a:hover {
-            text-decoration: underline;
+            color: #ddd;
+        }
+
+        .icon-link {
+            display: inline-block;
+            text-align: center;
+        }
+
+        .icon-link i {
+            font-size: 18px;
+        }
+
+        .icon-link span {
+            font-size: 12px;
+            display: block;
         }
     </style>
 </head>
@@ -85,18 +104,18 @@
     <div class="navbar">
         <div class="nav-left">
             {% if user.is_authenticated %}
-                Welcome, {{ user.username }}
+                <i class="fa-solid fa-user"></i> {{ user.username }}
             {% else %}
-                Job Portal
+                <strong>Job Portal</strong>
             {% endif %}
         </div>
         <div class="nav-right">
             {% if user.is_authenticated %}
-                <a href="{% url 'job_list' %}">Jobs</a>
-                <a href="{% url 'create_job' %}">Create Job</a>
-                <a href="{% url 'user_applications' %}">My Applications</a>
-                <a href="{% url 'user_profile' %}">Profile</a>
-                <a href="{% url 'user_logout' %}">Logout</a>
+                <a href="{% url 'job_list' %}" class="icon-link" title="Jobs"><i class="fa-solid fa-briefcase"></i></a>
+                <a href="{% url 'create_job' %}" class="icon-link" title="Create Job"><i class="fa-solid fa-plus"></i></a>
+                <a href="{% url 'user_applications' %}" class="icon-link" title="My Applications"><i class="fa-solid fa-file"></i></a>
+                <a href="{% url 'user_profile' %}" class="icon-link" title="Profile"><i class="fa-solid fa-user-circle"></i></a>
+                <a href="{% url 'user_logout' %}" class="icon-link" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></a>
             {% else %}
                 <a href="{% url 'user_login' %}">Login</a>
                 <a href="{% url 'register' %}">Register</a>
@@ -104,12 +123,9 @@
         </div>
     </div>
 
-    <button id="darkModeToggle" title="Toggle Dark Mode" style="font-size: 20px; background: none; border: none; cursor: pointer;">
-        🌙
-    </button>
+    <!-- Dark mode toggle -->
+    <button id="darkModeToggle" title="Toggle Dark Mode">🌙</button>
     
-    
-
     <hr>
 
     <div class="container">
@@ -119,24 +135,21 @@
     <script>
         const toggleButton = document.getElementById('darkModeToggle');
         const body = document.body;
-    
+
         function updateIcon() {
             toggleButton.textContent = body.classList.contains('dark-mode') ? '☀️' : '🌙';
         }
-    
-        // Check if dark mode was previously selected
+
         if (localStorage.getItem('darkMode') === 'true') {
             body.classList.add('dark-mode');
             updateIcon();
         }
-    
+
         toggleButton.addEventListener('click', () => {
             body.classList.toggle('dark-mode');
-            const isDarkMode = body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode);
+            localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
             updateIcon();
         });
     </script>
-    
 </body>
 </html>

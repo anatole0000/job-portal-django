@@ -16,13 +16,17 @@
         display: flex;
         justify-content: center;
         margin-bottom: 30px;
+        flex-wrap: wrap;
     }
 
-    .search-form input[type="text"] {
+    .search-form input[type="text"],
+    .search-form input[type="number"],
+    .search-form select {
         padding: 8px;
-        width: 300px;
+        margin: 5px;
+        width: 250px;
         border: 1px solid #ccc;
-        border-radius: 4px 0 0 4px;
+        border-radius: 4px;
     }
 
     .search-form button {
@@ -30,7 +34,7 @@
         border: 1px solid #007BFF;
         background-color: #007BFF;
         color: white;
-        border-radius: 0 4px 4px 0;
+        border-radius: 4px;
         cursor: pointer;
     }
 
@@ -90,17 +94,48 @@
 <div class="job-container">
     <h2>Job Listings</h2>
 
+    <!-- Search and Filter Form -->
     <form method="get" class="search-form">
+        <!-- Search input -->
         <input type="text" name="q" placeholder="Search jobs..." value="{{ request.GET.q }}">
+
+        <!-- Location filter -->
+        <input type="text" name="location" placeholder="Location" value="{{ location_filter }}">
+
+        <!-- Salary Range filter -->
+        <input type="number" name="salary_min" placeholder="Min Salary" value="{{ salary_min }}">
+        <input type="number" name="salary_max" placeholder="Max Salary" value="{{ salary_max }}">
+
+        <!-- Experience level filter -->
+        <select name="experience_level">
+            <option value="">Experience Level</option>
+            <option value="junior" {% if experience_level == "junior" %}selected{% endif %}>Junior</option>
+            <option value="mid" {% if experience_level == "mid" %}selected{% endif %}>Mid</option>
+            <option value="senior" {% if experience_level == "senior" %}selected{% endif %}>Senior</option>
+        </select>
+
+        <!-- Job type filter -->
+        <select name="job_type">
+            <option value="">Job Type</option>
+            <option value="full-time" {% if job_type == "full-time" %}selected{% endif %}>Full-time</option>
+            <option value="part-time" {% if job_type == "part-time" %}selected{% endif %}>Part-time</option>
+        </select>
+
+        <!-- Submit button -->
         <button type="submit">Search</button>
     </form>
 
+    <!-- Display jobs -->
     {% for job in page_obj %}
         <div class="job-card">
             <p class="job-title">
                 <a href="{% url 'job_detail' job.id %}">{{ job.title }}</a>
             </p>
             <p class="job-company">{{ job.company_name }} – {{ job.location }}</p>
+            <p>Salary: {{ job.salary_min }} - {{ job.salary_max }}</p>
+            <p>Experience: {{ job.experience_level }} | Job Type: {{ job.job_type }}</p>
+
+            <a href="{% url 'save_job' job.id %}" class="save-btn">Save for Later</a>
         </div>
     {% empty %}
         <p class="no-jobs">No jobs found.</p>
@@ -109,15 +144,15 @@
     <!-- Pagination Controls -->
     <div class="pagination">
         {% if page_obj.has_previous %}
-            <a href="?page=1&q={{ search_query }}">First</a>
-            <a href="?page={{ page_obj.previous_page_number }}&q={{ search_query }}">Previous</a>
+            <a href="?page=1&q={{ search_query }}&location={{ location_filter }}&salary_min={{ salary_min }}&salary_max={{ salary_max }}&experience_level={{ experience_level }}&job_type={{ job_type }}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}&q={{ search_query }}&location={{ location_filter }}&salary_min={{ salary_min }}&salary_max={{ salary_max }}&experience_level={{ experience_level }}&job_type={{ job_type }}">Previous</a>
         {% endif %}
         
         <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
         
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}&q={{ search_query }}">Next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}&q={{ search_query }}">Last</a>
+            <a href="?page={{ page_obj.next_page_number }}&q={{ search_query }}&location={{ location_filter }}&salary_min={{ salary_min }}&salary_max={{ salary_max }}&experience_level={{ experience_level }}&job_type={{ job_type }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}&q={{ search_query }}&location={{ location_filter }}&salary_min={{ salary_min }}&salary_max={{ salary_max }}&experience_level={{ experience_level }}&job_type={{ job_type }}">Last</a>
         {% endif %}
     </div>
 </div>
